@@ -1,0 +1,8 @@
+2019-07-26 23:52:43,038: INFO rootCategory : Message {fileName:main.cc functionName:main lineNumber:8}
+2019-07-26 23:52:43,039: ERROR rootCategory : Message {fileName:main.cc functionName:main lineNumber:9}
+2019-07-26 23:52:43,039: WARN rootCategory : Message {fileName:main.cc functionName:main lineNumber:10}
+2019-07-26 23:52:43,039: DEBUG rootCategory : Message {fileName:main.cc functionName:main lineNumber:11}
+2019-07-26 23:52:53,128: INFO rootCategory : Message {fileName:main.cc functionName:main lineNumber:8}
+2019-07-26 23:52:53,128: ERROR rootCategory : Message {fileName:main.cc functionName:main lineNumber:9}
+2019-07-26 23:52:53,128: WARN rootCategory : Message {fileName:main.cc functionName:main lineNumber:10}
+2019-07-26 23:52:53,128: DEBUG rootCategory : Message {fileName:main.cc functionName:main lineNumber:11}
