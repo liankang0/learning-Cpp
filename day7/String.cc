@@ -11,11 +11,11 @@
 #include "String.h"
 
 #include <iostream>
-
+#include <vector>
 using std::cout;
 using std::endl;
 using std::cin;
-
+using std::vector;
 String::String()
 {
     _pstr = new char[MAXSIZE];
@@ -37,16 +37,22 @@ String::~String()
 {
     delete []_pstr;
 }
-
+//三部曲：自复制、释放空间、深拷贝
 String& String::operator=(const String& lhs)
 {
+    if(*this != lhs)
+    {
+        delete [] _pstr;
+        _pstr  = new char[strlen(lhs._pstr) + 1];
+    }
     strcpy(_pstr, lhs._pstr);
     return *this;
 }
 
+//重用上面的赋值=、类型转换的构造函数
 String& String::operator=(const char* str)
 {
-    strcpy(_pstr, str);
+    *this = String(str);
     return *this;
 }
 
@@ -66,21 +72,23 @@ String& String::operator+=(const String& lhs)
     }
     return *this;
 }
+//应该充分应用上面已经重载的运算符
 String& String::operator+=(const char* str)
 {
-    if(sizeof(_pstr) - strlen(_pstr) < strlen(str))
-    {
-        char tmp[strlen(_pstr) + 1];
-        strcpy(tmp, _pstr);
-        _pstr = new char[strlen(_pstr) + strlen(str) + 1];
-        strcpy(_pstr, tmp);
-        strcat(_pstr, str);
-    }
-    else
-    {
-        strcat(_pstr, str);
-    }
-    return *this;
+    return *this += String(str);
+//    if(sizeof(_pstr) - strlen(_pstr) < strlen(str))
+//    {
+//        char tmp[strlen(_pstr) + 1];
+//        strcpy(tmp, _pstr);
+//        _pstr = new char[strlen(_pstr) + strlen(str) + 1];
+//        strcpy(_pstr, tmp);
+//        strcat(_pstr, str);
+//    }
+//    else
+//    {
+//        strcat(_pstr, str);
+//    }
+//    return *this;
         
 }
 
@@ -99,15 +107,7 @@ char String::operator[](std::size_t index)
 //和没有const的区别, 这里可能传入const， 所以传出也应该是const
 const char String::operator[](std::size_t index) const
 {
-    if(index < strlen(_pstr))
-    {
         return _pstr[index];
-    }
-    else
-    {
-        static char nullchar = '\0';
-        return nullchar;
-    }
 }
 
 std::size_t String::size() const
@@ -199,10 +199,20 @@ std::ostream &operator<<(std::ostream &os, const String &s)
     os << s._pstr;
     return os;
 }
-
+//使用vector解决无法知道is流里面内容的大小， 流get() 方法使用
 std::istream &operator>>(std::istream &is, String &s)
 {
-    is >> s._pstr;
+    vector<char> buff;
+    buff.reserve(65535);
+
+    char ch;
+    while((ch = is.get()) != '\n')
+    {
+        buff.push_back(ch);
+    }
+    
+    s = &buff[0];
+
     return is;
 }
 
