@@ -113,17 +113,27 @@ int TextQuery::readFile(const string fileName)
 void TextQuery::query(const string& word)
 {   
     //使用find，查询不到时返回一个末尾迭代器，输出的值为随机值？？？这个怎么解决？？？
+    //解决方法：判断返回的是否为end()迭代器
     //cout << word << " occurs " << _dict.find(word)->second << " times." << endl;
     //使用下标法查询，查不到时会改变内存中的_dict的内容，创建一个新的key，value为 '0',在这里不影响结果
-    cout << word << " occurs " << _dict[word] << " times." << endl;
+    //，但是查询次数越多，内存中的_dict就会越大
+    auto it = _dict.find(word);
+    if(it == _dict.end())
+    {
+        cout << word << " occurs 0 times." << endl;
+    }
+    else
+    {
+    cout << word << " occurs " << it->second << " times." << endl;
     printLineAndWordLine(word);
+    }
 }
 
 void TextQuery::printLineAndWordLine(const string& word)
 {
     for(auto it : _wordLine[word])
     {
-        cout << "     " << "(line" << it << ")" << _lines[it] << endl;
+        cout << "     " << "(line" << it << ")    " << _lines[it] << endl;
     }
 }
 
