@@ -40,7 +40,7 @@ enum WarriorType
 //为了通过某种颜色或者武士类型，得到字符串，所以实现了以下inline函数.
 inline string toString(Color color)
 {
-    return (color == RED) ? string("red"): string("bule");
+    return (color == RED) ? string("red"): string("blue");
 }
 
 inline string toString(WarriorType type)
@@ -135,17 +135,19 @@ public:
         ,_id(id)
         ,_forces(forces)
         ,_type(type)
-        {    }
+        ,_hp(hp)
+        {   if(_color == RED) _cityId = 0; else _cityId = GameConfig::getInstance()->cityCount() + 1; }
     virtual ~Warrior(){ }
 
     virtual void march();//行军
     virtual void attack(Warrior* warrior);//攻击另一个武士
     virtual void defense(Warrior* warrior);//反击另一个武士
     virtual size_t getLoyalty() const { };
-    void beWinner(Warrior* warrior) ;
+    void beWinner() ;
     void beRewarded();
     //void bekill() { }//从司令部和城市删除
-    void setElements(size_t elements)  {    _earnElements += elements; }
+    bool reachDestination(); 
+    void setElements(size_t elements)  {  _earnElements = elements; }
     void sentElementsToHeadquarters(); 
     void setHp(size_t hp) { _hp = hp;   }
     void setCity(size_t id) {  _cityId = id;   }
@@ -254,10 +256,13 @@ public:
     void produceElements();//城市生产生命元
     void attach(Warrior*);//某武士进入该城市
     void detach(Warrior*);
-    void startBattle();//开始战斗
+    bool startBattle();//开始战斗
     void takenBy();//生命元被某武士取走
+    Color getFlagColor() {   return _flag;  }
+    size_t getElements() { return _elements; }
+    size_t getId() {    return _id; }
 private:
-    void battle(Warrior* warrior1, Warrior* warrior2);//两名武士具体战斗状况
+    bool battle(Warrior* warrior1, Warrior* warrior2);//两名武士具体战斗状况
     bool isChangingFlag();//是否更换旗帜
 private:
     Color _flag;//城市旗子的颜色
@@ -282,6 +287,7 @@ public:
     ,_elements(elements)
     ,_earnElements(0)
     ,_nextWarriorIndex(0)
+    ,_warriorId(1)
     { }
     
     virtual ~Headquarters() {   }
@@ -296,11 +302,13 @@ public:
     void reward();
 
     //统计从城市获取的生命元
-    void increaseElements(size_t elements) {    _earnElements += elements;  }
+    void increaseElements(size_t elements) {   _earnElements += elements; }
 
     //设置所剩生命元的数量
     void setElements() { _elements += _earnElements; _earnElements = 0;   }
 
+    //当前制造武士的生命值
+    size_t getCurWarriorLife() {  return GameConfig::getInstance()->warriorInitalLife(_warriorCreatingOrder[_nextWarriorIndex]);}
     template <typename Iterator>
     void setWarriorCreatingOrder(Iterator beg, Iterator end)
     {
@@ -339,6 +347,8 @@ protected:
     size_t _earnElements;
     size_t _nextWarriorIndex;
     vector<WarriorType> _warriorCreatingOrder;//武士生产顺序
+
+    size_t _warriorId;
     struct WarriorComparator
     {
          bool operator()(Warrior* a, Warrior* b)
@@ -371,7 +381,7 @@ public:
         while(1)
         {
             createWarrior();
-            if(!warriorMarch())
+            if(warriorMarch())
             {
                 break;
             }
@@ -399,15 +409,15 @@ private:
     void init();
     //--------------事件begin------------------
     void createWarrior();
-    bool warriorMarch();
     void cityProduceElements();
     void takeCityElements();
+    bool warriorMarch();
     void battle();
     void headquartersReportElements();
     //---------------事件end---------------------
 
     bool createWarrior(Headquarters*);
-    void warriorMarch(Headquarters* Headquarters);
+    bool warriorMarch(Headquarters* Headquarters);
     bool checkRedHeadquarterBeTaken();
     bool checkBlueHeadquarterBeTaken();
 private:
@@ -416,7 +426,7 @@ private:
     vector<City> _citis;
 };
 
- template <typename Iterator>
+template <typename Iterator>
 void WarcraftWorld::setRedWarriorCreateOrder(Iterator beg, Iterator end)
 {
     _redHeadquarters->setWarriorCreatingOrder(beg, end);
@@ -440,11 +450,12 @@ public:
     void showMarch() const;
     void showEarnElements() const;
     void showRearchDestination() const;
+    void showDeath() const;
 protected:
     void showName() const;
     void showToCity() const;
     void showInCity() const;
-    void showDeath() const;
+    
     void showElementsAndForces() const;
 protected:
     Warrior* _warrior;
@@ -458,7 +469,6 @@ public:
     DragonView(Warrior* warrior)
     :WarriorView(warrior)
     {}
-
     void showYell() const;
 };
 

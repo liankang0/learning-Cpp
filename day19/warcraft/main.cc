@@ -29,19 +29,27 @@ ICEMAN_TYPE,
 WOLF_TYPE
 };
 
-#if 0
+#if 1
 //先测游戏配置类
 //GameConfig::getInstance()->setWarriorOrder(types1.begin(),types1.end());
 GameConfig::getInstance()->readFromFile("warcraft.conf");
 //GameConfig::getInstance()->readFromFile(argv[1]);
 //GameConfig::getInstance()->readFromConsole();
 //GameConfig::getInstance()->debug();
-cout <<  "_groups  count =" << GameConfig::getInstance()->group() << endl;
-GameConfig::getInstance()->nextGroupId();
-cout << "this group city count = " << GameConfig::getInstance()->cityCount() << endl;
-cout << "this group DRAGON_TYPE lifecount = " << GameConfig::getInstance()->warriorInitalLife(DRAGON_TYPE) << endl;
+//cout <<  "_groups  count =" << GameConfig::getInstance()->group() << endl;
+// GameConfig::getInstance()->nextGroupId();
+//cout << "this group city count = " << GameConfig::getInstance()->cityCount() << endl;
+//cout << "this group DRAGON_TYPE lifecount = " << GameConfig::getInstance()->warriorInitalLife(ICEMAN_TYPE) << endl;
 #endif
-#if 1
+WarcraftWorld warcraftWorld;
+warcraftWorld.setBlueWarriorCreateOrder(types3.begin(), types3.end());
+warcraftWorld.setRedWarriorCreateOrder(types2.begin(), types2.end());
+warcraftWorld.start();
+// warcraftWorld.~WarcraftWorld();
+// GameConfig::destory();
+// GameTime::destory();
+
+#if 0
 //再测游戏时间类
 for(int idx = 0; idx != 100; ++idx)
 {
